@@ -1,0 +1,4 @@
+#+TITLE: deeprs
+#+AUTHOR: Konstantin Bücheler
+
+(WIP) deeprs is a command line wrapper of the DeepL translator API.
