@@ -1,4 +1,6 @@
 use clap::{Arg, App};
+use dirs;
+use std::{fs, io};
 use reqwest;
 use serde::Deserialize;
 
@@ -15,6 +17,7 @@ struct Translation {
 
 struct Input {
     text: String,
+    api_key: String,
     // TODO: Add enum for languages
     source_language: Option<String>,
     target_language: String,
@@ -22,9 +25,10 @@ struct Input {
 }
 
 impl Input {
-    fn new(text: String, target_language: String, source_language: Option<String>) -> Input {
+    fn new(text: String, api_key: String, target_language: String, source_language: Option<String>) -> Input {
         Input {
             text: text,
+            api_key: api_key,
             target_language: target_language,
             source_language: source_language,
             search_string: String::new()
@@ -33,7 +37,7 @@ impl Input {
 
     fn build_search_string(&mut self) {
         self.search_string.push_str("auth_key=");
-        self.search_string.push_str(API_KEY);
+        self.search_string.push_str(&self.api_key);
         self.search_string.push_str("&text=");
         self.search_string.push_str(&self.text);
         self.search_string.push_str("&target_lang=");
@@ -44,9 +48,6 @@ impl Input {
         }
     }
 }
-
-// TODO: Read from File
-static API_KEY: &'static str = "";
 
 fn send_request(search_string: String) -> Option<Translations> {
     let client = reqwest::blocking::Client::new();
@@ -65,6 +66,27 @@ fn send_request(search_string: String) -> Option<Translations> {
             println!("Status Code: {}", resp.status());
             None
         }
+    }
+}
+
+fn get_api_key() -> Result<String, String>{
+    let home_dir = dirs::home_dir();
+    match home_dir{
+        Some(mut home_dir) => {
+            home_dir.push(".deeprs");
+            match fs::read_to_string(&home_dir) {
+                Ok(api_key) => Ok(api_key),
+                Err(_) => {
+                    println!("No API key was found on your system.");
+                    println!("Please enter a valid API key: ");
+                    let mut api_key = String::new();
+                    io::stdin().read_line(&mut api_key).expect("Failed to read input");
+                    fs::write(home_dir, &api_key).expect("Failed writing key file");
+                    Ok(api_key)
+                }
+            }
+        },
+        None => Err(String::from("Faild getting home directory"))
     }
 }
 
@@ -91,12 +113,15 @@ fn main() {
               .help("Text you want to translate")
         ).get_matches();
 
+    let api_key = get_api_key().unwrap();
+
     let mut user_input = Input::new(matches.value_of_lossy("text").unwrap().to_string(),
-                                matches.value_of("target language").unwrap().to_string(),
-                                match matches.value_of("source language") {
-                                    Some(sl) => Some(sl.to_string()),
-                                    None => None
-                                });
+                                    api_key,
+                                    matches.value_of("target language").unwrap().to_string(),
+                                    match matches.value_of("source language") {
+                                        Some(sl) => Some(sl.to_string()),
+                                        None => None
+                                    });
 
     user_input.build_search_string();
 
