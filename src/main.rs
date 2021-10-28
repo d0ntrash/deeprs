@@ -78,6 +78,8 @@ fn get_api_key() -> Result<String, String>{
                 Ok(api_key) => Ok(api_key),
                 Err(_) => {
                     println!("No API key was found on your system.");
+                    println!("If you don't have one yet, you can register here for free:");
+                    println!("https://www.deepl.com/pro-api?cta=header-pro-api/");
                     println!("Please enter a valid API key: ");
                     let mut api_key = String::new();
                     io::stdin().read_line(&mut api_key).expect("Failed to read input");
