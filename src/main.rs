@@ -93,10 +93,8 @@ fn get_api_key() -> Result<String, String>{
 }
 
 fn main() {
-    let matches = App::new("Deeprs: CLI for DeepL")
+    let matches = App::new("deeprs: CLI for DeepL")
         .version("0.1.0")
-        .author("Konstantin Bücheler @d0ntrash")
-        .about("Add description here!")
         .arg(Arg::with_name("source language")
              .required(false)
              .short("s")

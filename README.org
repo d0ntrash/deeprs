@@ -1,4 +1,45 @@
-#+TITLE: deeprs
-#+AUTHOR: Konstantin Bücheler
+#+TITLE: deeprs - A command line wrapper of DeepL API
+#+AUTHOR: Konstantin
 
-(WIP) deeprs is a command line wrapper of the DeepL translator API.
+
+** About
+   deeprs is a command line wrapper of the DeepL translator API.
+   To use it you need a API key which you can get here: https://www.deepl.com/pro-api?cta=header-pro-api/
+
+** Usage
+   #+BEGIN_SRC
+     $ ./deeprs --help
+     deeprs: CLI for DeepL 0.1.0
+
+     USAGE:
+         deeprs [OPTIONS] <text> -t <target language>
+
+     FLAGS:
+         -h, --help       Prints help information
+         -V, --version    Prints version information
+
+     OPTIONS:
+         -s <source language>        Define the source language. This is not needed in the most cases since DeepL can detect
+                                     the source language by its own
+         -t <target language>        target language
+
+     ARGS:
+         <text>    Text you want to translate
+   #+END_SRC
+
+   #+BEGIN_SRC
+   $ ./deeprs -t de "Hello World"
+   From Language: EN
+   Text: Hallo Welt
+   #+END_SRC
+
+   #+BEGIN_SRC
+   $ ./deeprs -t en -s de "Hello World"
+   From Language: DE
+   Text: Hello World
+   #+END_SRC
+** Build
+   To build deeprs via cargo (make sure you have [[https://rustup.rs/][rustup]] and openssl installed on your system):
+   #+BEGIN_SRC
+   cargo build --release
+   #+END_SRC
